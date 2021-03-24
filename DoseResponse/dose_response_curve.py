@@ -52,7 +52,7 @@ class DoseResponseCurve():
         self.fit_parameters = {}
 
     def scatterplot(self, func=None, 
-                    xlabel='[cAMP] (nM)',
+                    xlabel='[Compound] (nM)',
                     ylabel='Anisotropy',
                     palette='viridis_r',
                     baseline_correction=True, 
