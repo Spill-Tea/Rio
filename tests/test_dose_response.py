@@ -11,7 +11,7 @@ from DoseResponse.equations import Equations
 
 # Global Variables
 PARENT_DIRECTORY = os.path.dirname(__file__)
-TEST_DATA = os.path.realpath(PARENT_DIRECTORY, 'SampleData', '2comp_test.txt')
+#TEST_DATA = os.path.realpath(PARENT_DIRECTORY, 'SampleData', '2comp_test.txt')
 
 
 def test_something():
