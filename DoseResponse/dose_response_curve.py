@@ -52,7 +52,7 @@ class DoseResponseCurve():
         self.fit_parameters = {}
 
     def scatterplot(self, func=None, 
-                    xlabel='[cAMP] (nM)',
+                    xlabel='[Compound] (nM)',
                     ylabel='Anisotropy',
                     palette='viridis_r',
                     baseline_correction=True, 
@@ -205,7 +205,8 @@ class DoseResponseCurve():
 
 def main():
     # Manual User Defined Parameters
-    filename = '/Users/JDelRio/Desktop/Python/DoseResponsePlotting/SampleData/2comp_test.txt'
+    filename = '../SampleData/2comp_test.txt'
+    output_name = 'Test'
 
     # Call Class
     x = DoseResponseCurve(
@@ -218,10 +219,10 @@ def main():
     x.scatterplot(func=Equations.VariableSlopeDoseResponse)
 
     # Output Fitting
-    #x.df_summary.to_csv('summary.txt', sep='\t')
-    #x.df_main.to_csv('output_test.txt', sep='\t')
-    #x.df_plot_ready.to_csv('plot_ready.txt', sep='\t')
-    #x.fit_parameters.to_csv(f'{}_Fit_Parameters.txt', sep='\t')
+    x.df_summary.to_csv(f'{output_name}_summary.txt', sep='\t')
+    x.df_main.to_csv(f'{output_name}_output.txt', sep='\t')
+    x.df_plot_ready.to_csv(f'{output_name}_plot_ready.txt', sep='\t')
+    x.fit_parameters.to_csv(f'{output_name}_Fit_Parameters.txt', sep='\t')
     
     # Show Dose Response Curves
     plt.show()
