@@ -1,4 +1,4 @@
-''' Basic Equations '''
+""" Basic Equations """
 
 # Python Dependencies
 import pandas as pd
@@ -41,8 +41,3 @@ class Equations(object):
     @staticmethod
     def OneSiteSpecificBinding(x, Bmax, Kd):
         return Bmax * x / (Kd + x)
-
-
-
-
-
