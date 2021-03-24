@@ -205,7 +205,7 @@ class DoseResponseCurve():
 
 def main():
     # Manual User Defined Parameters
-    filename = '/Users/JDelRio/Desktop/Python/DoseResponsePlotting/SampleData/2comp_test.txt'
+    filename = '../SampleData/2comp_test.txt'
 
     # Call Class
     x = DoseResponseCurve(
