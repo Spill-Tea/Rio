@@ -6,24 +6,24 @@ import numpy as np
 import seaborn as sns
 
 import matplotlib.pyplot as plt
-import scipy.optimize as opt
+#import scipy.optimize as opt
 
-from equations import Equations
+from DoseResponse.equations import Equations
+#from equations import Equations
 
 from scipy.optimize import curve_fit
-from scipy.optimize import minimize
 from scipy.stats.distributions import t
 
 
-class DoseResponseCurve():
+class DoseResponseCurve(object):
     """
         TODO: Insert Docstring Here ...
     """
     
     def __init__(self, datafile, 
-                method=None, 
-                top_data=None, 
-                bottom_data=None):
+                 method=None,
+                 top_data=None,
+                 bottom_data=None):
         
         # Instance Args
         self.datafile = datafile
@@ -89,8 +89,8 @@ class DoseResponseCurve():
         # Iterate Through Compounds in Dataframe and Perform Fit for Each
         for c in compounds:
             # Group Data by Compound and Filter out np.nan values
-            df = self.df_plot_ready[(self.df_plot_ready['COMPOUND'] == c) & (~np.isnan(self.df_plot_ready['value']))].copy()
-            #df = df[~np.isnan(df['value'])]  # Remove np.nan values
+            df = self.df_plot_ready[(self.df_plot_ready['COMPOUND'] == c) &
+                                    (~np.isnan(self.df_plot_ready['value']))].copy()
             
             # Remove Baseline if Data has a Concentration = 0
             # TODO: Provide an Alternative method for an identical baseline across all samples
@@ -110,14 +110,14 @@ class DoseResponseCurve():
             df_list.append(df)
 
             # Fit Curve to Normalized Data
-            popt, popv = opt.curve_fit(func,
-                                       method='trf',
-                                       xdata=df['CONCENTRATION'],
-                                       ydata=df['value_normalized'],
-                                       xtol=1e-12,
-                                       ftol=1e-12,
-                                       gtol=1e-12,
-                                       **kargs)
+            popt, popv = curve_fit(func,
+                                   method='trf',
+                                   xdata=df['CONCENTRATION'],
+                                   ydata=df['value_normalized'],
+                                   xtol=1e-12,
+                                   ftol=1e-12,
+                                   gtol=1e-12,
+                                   **kargs)
 
             # Calculate 95% Confidence Intervals
             degrees_of_freedom = max(0, len(df) - len(popt))
@@ -125,8 +125,8 @@ class DoseResponseCurve():
             l_ci = []
             for val, var in zip(popt, np.diag(popv)):
                 sigma = var ** 0.5
-                CI = (val - sigma * t_value, val + sigma * t_value)
-                l_ci.append(CI)
+                ci = (val - sigma * t_value, val + sigma * t_value)
+                l_ci.append(ci)
 
             # Report Best Fit Values
             self.fit_parameters[c] = [*popt, *l_ci]
@@ -135,15 +135,16 @@ class DoseResponseCurve():
             xdata = np.linspace(start=df['CONCENTRATION'].min(), 
                                 stop=df['CONCENTRATION'].max(), 
                                 num=int(df['CONCENTRATION'].max())
-                               )
+                                )
             plt.plot(func(xdata, *popt), ':', label=c, color=colors[count])
             count += 1
         
         # Finishing Touches on Dataframe
-        df_concat = pd.concat(df_list, axis = 0)
+        df_concat = pd.concat(df_list, axis=0)
         self.df_plot_ready = self.df_plot_ready.merge(df_concat, 
-                                    on=['COMPOUND', 'CONCENTRATION', 'variable', 'value'],
-                                    how='left')
+                                                      on=['COMPOUND', 'CONCENTRATION', 'variable', 'value'],
+                                                      how='left'
+                                                      )
         
         # Finalize Best Fit Reporting
         cols = list(inspect.getfullargspec(func))[0][1:]
@@ -151,7 +152,7 @@ class DoseResponseCurve():
         self.fit_parameters = pd.DataFrame.from_dict(self.fit_parameters,
                                                      orient='index',
                                                      columns=columns
-                                                    )
+                                                     )
 
         # Prepare Seaborn Scatter plot
         self.plot = sns.scatterplot(
@@ -174,22 +175,22 @@ class DoseResponseCurve():
         self.df_main[['COMPOUND', 'CONCENTRATION']] = [[i, float(x)] for i, x in self.df_main.index]
         self.n_compounds = len(set(self.df_main['COMPOUND']))
         self.df_plot_ready = pd.melt(self.df_main,
-                                id_vars=['COMPOUND', 'CONCENTRATION'],
-                                value_vars=[n for n in range(self.n_replicates)]
-        )
+                                     id_vars=['COMPOUND', 'CONCENTRATION'],
+                                     value_vars=[n for n in range(self.n_replicates)]
+                                     )
 
     def _remove_baseline(self):
         # Calculate mean of "0% signal"
         if self.bottom is None:
             print('0% Signal is not Defined. Data was not normalized.')
         else:
-            baseline = self.bottom.mean() #no need to define axis of a series
+            baseline = self.bottom.mean()  # no need to define axis of a series
             for n in self.n_replicates:
                 self.df_normalized[n] = self.df_main[n] - baseline
 
     def data_summary(self):
         """This function summarizes the raw Data."""
-        #TODO: Create a similar function which performs on normalized
+        # TODO: Create a similar function which performs on normalized
         if self.df_main is None:
             self._load_data()
         self.df_summary = self.df_main.copy()
@@ -199,13 +200,14 @@ class DoseResponseCurve():
 
     def _load_data(self):
         """Helper Function to Load data from a file."""
-        self.df_main = pd.read_csv(self.datafile, header=[0,1], sep='\t').T
+        self.df_main = pd.read_csv(self.datafile, header=[0, 1], sep='\t').T
         self.n_replicates = len(self.df_main.columns)
 
 
 def main():
     # Manual User Defined Parameters
     filename = '../SampleData/2comp_test.txt'
+    output_name = 'Test'
 
     # Call Class
     x = DoseResponseCurve(
@@ -214,14 +216,14 @@ def main():
                          )
     
     x.data_summary()
-    x._prep_data_for_plotting()
+    #x._prep_data_for_plotting()
     x.scatterplot(func=Equations.VariableSlopeDoseResponse)
 
     # Output Fitting
-    #x.df_summary.to_csv('summary.txt', sep='\t')
-    #x.df_main.to_csv('output_test.txt', sep='\t')
-    #x.df_plot_ready.to_csv('plot_ready.txt', sep='\t')
-    #x.fit_parameters.to_csv(f'{}_Fit_Parameters.txt', sep='\t')
+    x.df_summary.to_csv(f'{output_name}_summary.txt', sep='\t')
+    x.df_main.to_csv(f'{output_name}_output.txt', sep='\t')
+    x.df_plot_ready.to_csv(f'{output_name}_plot_ready.txt', sep='\t')
+    x.fit_parameters.to_csv(f'{output_name}_Fit_Parameters.txt', sep='\t')
     
     # Show Dose Response Curves
     plt.show()
@@ -229,4 +231,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
