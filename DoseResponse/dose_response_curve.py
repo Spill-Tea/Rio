@@ -11,6 +11,7 @@ from scipy.optimize import curve_fit
 from scipy.stats.distributions import t
 from matplotlib import pyplot as plt
 
+
 class DoseResponseCurve(object):
     """
         Process raw dose response data, removing baseline or various
@@ -148,6 +149,7 @@ class DoseResponseCurve(object):
                                    xtol=1e-12,
                                    ftol=1e-12,
                                    gtol=1e-12,
+                                   *args,
                                    **kargs)
 
             # Calculate 95% Confidence Intervals

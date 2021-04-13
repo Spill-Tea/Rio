@@ -9,6 +9,7 @@ import os
 from DoseResponse.dose_response_curve import DoseResponseCurve
 from DoseResponse.equations import Equations
 
+
 # Global Variables
 PARENT_DIRECTORY = os.path.dirname(os.path.dirname(__file__))
 TEST_DATA_PATH = os.path.join(PARENT_DIRECTORY, 'SampleData', '2comp_test.txt')

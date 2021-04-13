@@ -1,7 +1,6 @@
 """ Basic Equations """
 
 # Python Dependencies
-import pandas as pd
 import numpy as np
 
 
