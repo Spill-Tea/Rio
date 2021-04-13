@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 from DoseResponse.equations import Equations
-#from equations import Equations
+# from equations import Equations
 
 from inspect import getfullargspec
 from scipy.optimize import curve_fit
