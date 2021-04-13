@@ -179,7 +179,7 @@ class DoseResponseCurve(object):
                                                       on=['COMPOUND', 'CONCENTRATION', 'variable', 'value'],
                                                       how='left'
                                                       )
-        
+
         # Finalize Best Fit Reporting
         cols = list(getfullargspec(func))[0][1:]
         columns = [*cols, *[f'{i}_CI' for i in cols]]
