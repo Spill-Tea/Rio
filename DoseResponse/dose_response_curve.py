@@ -52,18 +52,18 @@ class DoseResponseCurve(object):
             fit_parameters (dict --> DataFrame)
                 The Results of Curve Fitting derived from the normalized data
     """
-    
-    def __init__(self, datafile, 
+
+    def __init__(self, datafile,
                  method=None,
                  top_data=None,
                  bottom_data=None):
-        
+
         # Instance Args
         self.datafile = datafile
-        self.method = method  
+        self.method = method
 
         if top_data is not None:
-            self.top = pd.read_csv(top_data, sep='\t', header=None)[0].mean() 
+            self.top = pd.read_csv(top_data, sep='\t', header=None)[0].mean()
         else:
             self.top = None
 
@@ -82,19 +82,19 @@ class DoseResponseCurve(object):
         self.plot = None
         self.fit_parameters = {}
 
-    def scatterplot(self, func=None, 
+    def scatterplot(self, func=None,
                     xlabel='[Compound] (nM)',
                     ylabel='Anisotropy',
                     palette='viridis_r',
-                    baseline_correction=True, 
+                    baseline_correction=True,
                     *args, **kargs):
-    
+
         """Plot and Curve Fit data on a log[x] axis."""
         # Initial Checks
         if self.df_main is None:
             self._load_data()
             self._prep_data_for_plotting()
-        
+
         if self.df_plot_ready is None:
             self._prep_data_for_plotting()
 
@@ -112,7 +112,7 @@ class DoseResponseCurve(object):
                 > rainbow
                 > ocean_r
                 > ocean
-                > viridis_r 
+                > viridis_r
         """
 
         # Iterate Through Compounds in Dataframe and Perform Fit for Each
@@ -120,7 +120,7 @@ class DoseResponseCurve(object):
             # Group Data by Compound and Filter out np.nan values
             df = self.df_plot_ready[(self.df_plot_ready['COMPOUND'] == c) &
                                     (~np.isnan(self.df_plot_ready['value']))].copy()
-            
+
             # Remove Baseline if Data has a Concentration = 0
             # TODO: Provide an Alternative method for an identical baseline across all samples
             # TODO: Provide an Alternative Alternative Method to Group by Sample Date or Experiment ID.
@@ -137,7 +137,7 @@ class DoseResponseCurve(object):
             else:
                 # No Normalization of Data
                 df['value_normalized'] = df['value_corrected']
-            
+
             # Add Newly computed Data to List
             df_list.append(df)
 
@@ -165,17 +165,17 @@ class DoseResponseCurve(object):
             self.fit_parameters[c] = [*popt, *l_ci]
 
             # Add Fitting to Plot
-            xdata = np.linspace(start=df['CONCENTRATION'].min(), 
+            xdata = np.linspace(start=df['CONCENTRATION'].min(),
                                 stop=df['CONCENTRATION'].max(),
                                 num=int(df['CONCENTRATION'].max()),
                                 endpoint=True
                                 )
             plt.plot(func(xdata, *popt), ':', label=c, color=colors[count])
             count += 1
-        
+
         # Finishing Touches on Dataframe
         df_concat = pd.concat(df_list, axis=0)
-        self.df_plot_ready = self.df_plot_ready.merge(df_concat, 
+        self.df_plot_ready = self.df_plot_ready.merge(df_concat,
                                                       on=['COMPOUND', 'CONCENTRATION', 'variable', 'value'],
                                                       how='left'
                                                       )
@@ -195,8 +195,8 @@ class DoseResponseCurve(object):
                     x=self.df_plot_ready['CONCENTRATION'],
                     y=self.df_plot_ready['value_normalized'],
                     palette=colors
-                                   )  
-                          
+                                   )
+
         # Additional Peripheral Plot Parameters
         self.plot.set(xscale="log",
                       xlabel=xlabel,
@@ -248,7 +248,7 @@ def main():
         datafile=filename,
         method=Equations.VariableSlopeDoseResponse
                          )
-    
+
     x.data_summary()
     print(x.df_summary)
     x.scatterplot(func=Equations.VariableSlopeDoseResponse)
