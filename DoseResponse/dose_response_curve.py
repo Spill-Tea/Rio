@@ -87,6 +87,7 @@ class DoseResponseCurve(object):
                     ylabel='Anisotropy',
                     palette='viridis_r',
                     baseline_correction=True,
+                    invert=False,
                     *args, **kargs):
 
         """Plot and Curve Fit data on a log[x] axis."""
@@ -132,11 +133,23 @@ class DoseResponseCurve(object):
             df = df[df['CONCENTRATION'] != 0]
 
             # Normalize Data by Definition of 100% ...
-            if self.top:
+            if self.top and baseline_correction:
+                df['value_normalized'] = df['value_corrected'] * 100 / (self.top - baseline)
+            elif self.top:
                 df['value_normalized'] = df['value_corrected'] * 100 / self.top
             else:
                 # No Normalization of Data
                 df['value_normalized'] = df['value_corrected']
+
+            # Invert Data
+            if invert and self.top:
+                df['value_normalized'] = 100 - df['value_normalized']
+            elif invert:
+                # Currently Very Crude ... TODO: Find and use max mean value?... Maybe
+                max_value = df['value_normalized'].max()
+                df['value_normalized'] = 100 - df['value_normalized'] * 100 / max_value
+            else:
+                pass
 
             # Add Newly computed Data to List
             df_list.append(df)
